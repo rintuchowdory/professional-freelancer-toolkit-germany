@@ -1,0 +1,62 @@
+name: PR Review — Code Quality
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format --check || echo "::warning::Some files need formatting. Run 'pnpm format' locally."
+
+      - name: TypeScript strict check
+        run: pnpm check
+
+      - name: Build verification
+        run: pnpm build
+        env:
+          VITE_APP_TITLE: "Freelancer Toolkit Germany"
+          VITE_ANALYTICS_ENDPOINT: ""
+          VITE_ANALYTICS_WEBSITE_ID: ""
+          VITE_FRONTEND_FORGE_API_KEY: ""
+          VITE_FRONTEND_FORGE_API_URL: ""
+          VITE_OAUTH_PORTAL_URL: ""
+          VITE_APP_ID: "freelancer-toolkit-germany"
+          VITE_APP_LOGO: ""
+
+      - name: Comment build status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            const message = status === 'success'
+              ? '**Build passed** — TypeScript checks and production build succeeded.'
+              : '**Build failed** — Please check the workflow logs for details.';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${emoji} ${message}\n\n> Automated check by Freelancer Toolkit Germany CI`
+            });
