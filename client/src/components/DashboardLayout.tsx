@@ -235,7 +235,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
  {/* Desktop Sidebar */}
  <aside
  className={cn(
- "hidden lg:flex flex-col shrink-0 transition-all duration-200",
+ "hidden lg:flex flex-col shrink-0 transition-all duration-200 bg-sidebar",
  collapsed ? "w-16" : "w-60"
  )}
  style={{ transition: "width 200ms cubic-bezier(0.23, 1, 0.32, 1)" }}
@@ -250,7 +250,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
  className="fixed inset-0 bg-black/50"
  onClick={() => setSidebarOpen(false)}
  />
- <aside className="relative z-10 w-60 flex flex-col">
+ <aside className="relative z-10 w-60 flex flex-col bg-sidebar">
  <SidebarContent />
  </aside>
  </div>
@@ -289,7 +289,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
  </div>
  </header>
 
- <main className="flex-1 overflow-y-auto">
+ <main className="flex-1 overflow-y-auto bg-background">
  <div className="animate-fade-in-up">
  {children}
  </div>
